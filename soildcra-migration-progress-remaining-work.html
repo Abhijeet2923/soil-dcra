@@ -1,0 +1,624 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SoilDCRA Migration Report</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+  h1 { font-size: 22px; font-weight: 700; color: #1f2328; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #57606a; margin-bottom: 32px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1f2328; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e5e7eb; }
+  h3 { font-size: 13px; font-weight: 700; color: #1f2328; margin: 18px 0 6px; }
+  p { margin-bottom: 10px; color: #1f2328; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; }
+
+  /* Status badges */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.03em;
+  }
+  .done   { background: #e6f4ea; color: #1a6b35; }
+  .wip    { background: #fff3cd; color: #8a5700; }
+  .todo   { background: #f0f0f0; color: #57606a; }
+  .bug    { background: #fde8e8; color: #8b1c1c; }
+  .fixed  { background: #e6f4ea; color: #1a6b35; }
+  .new    { background: #e8f0fb; color: #1a4b8c; }
+
+  /* Section blocks */
+  .section-block {
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: #f7f8fa;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .section-title { font-size: 13px; font-weight: 700; color: #1f2328; }
+  .section-body { padding: 12px 14px; }
+
+  /* Task rows */
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-check { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .task-body { flex: 1; }
+  .task-detail { font-size: 12px; color: #57606a; margin-top: 2px; }
+
+  /* Code inline */
+  code {
+    background: #f6f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 12px;
+    font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+    color: #24292f;
+  }
+
+  /* Code block */
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-size: 12px;
+    font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+    color: #24292f;
+    margin: 8px 0 12px;
+    line-height: 1.5;
+  }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0 12px; }
+  th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+       letter-spacing: 0.07em; color: #57606a; border-bottom: 1px solid #d0d7de;
+       padding: 6px 8px; }
+  td { padding: 7px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f7f8fa; }
+
+  /* Alert boxes */
+  .alert {
+    border-left: 3px solid #3b82d4;
+    background: #f0f6ff;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .alert.warn { border-left-color: #d97706; background: #fffbeb; }
+  .alert.success { border-left-color: #16a34a; background: #f0fdf4; }
+
+  /* Progress bar */
+  .progress-wrap { margin: 16px 0; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #57606a; margin-bottom: 4px; }
+  .progress-track { background: #e5e7eb; border-radius: 3px; height: 8px; }
+  .progress-fill { background: #3b82d4; height: 8px; border-radius: 3px; }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 11px;
+    color: #57606a;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>SoilDCRA — Streamlit → React Migration</h1>
+<div class="subtitle">Full progress report · Sub-Task 1 (Backend Additions) · Generated after session</div>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>Overall migration progress</span>
+    <span>1 of 11 sub-tasks complete (~9%)</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" style="width:9%"></div></div>
+</div>
+
+
+<h2>Phase 0 — Architecture Audit (Completed Before Coding)</h2>
+
+<p>Before a single line of code was changed, every relevant project file was read in full and an architecture report was produced. This is the foundation the migration plan rests on.</p>
+
+<h3>What was read</h3>
+<ul>
+  <li><strong>Backend (14 files):</strong> <code>app/main.py</code>, <code>app/core/config.py</code>, <code>app/db/models.py</code>, <code>app/db/database.py</code>, <code>app/api/v1/fields.py</code>, <code>app/api/v1/soil.py</code>, <code>app/api/v1/analysis.py</code>, <code>app/api/v1/optimization.py</code>, <code>app/services/soil_service.py</code>, <code>app/services/suitability_service.py</code>, <code>app/services/degradation_service.py</code>, <code>app/services/economics_service.py</code>, <code>app/optimization/rotation_optimizer.py</code>, <code>app/data/crop_data.py</code>, <code>app/data/seed.py</code>, all <code>app/schemas/*.py</code>, <code>requirements.txt</code></li>
+  <li><strong>Frontend:</strong> <code>streamlit_app.py</code> (1480 lines, read completely)</li>
+  <li><strong>Tests:</strong> <code>tests/smoke_test.py</code>, <code>tests/test_optimizer.py</code>, <code>tests/test_soil.py</code>, <code>tests/test_suitability.py</code></li>
+  <li><strong>Root:</strong> <code>run.py</code>, <code>README.md</code></li>
+</ul>
+
+<h3>Key findings from the audit</h3>
+<div class="section-block">
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">📋</span>
+      <div class="task-body"><strong>27 API endpoints inventoried</strong> across 4 routers (fields, soil, analysis, optimization)<div class="task-detail">Full table in the original audit report including method, path, request fields, response fields</div></div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">📋</span>
+      <div class="task-body"><strong>13 database tables documented</strong> with all columns, types, and SQLAlchemy relationships<div class="task-detail">fields, soil_observations, crops, crop_requirements, crop_economics, crop_history, field_problems, fertilizer_products, fertilizer_usage, rotation_rules, optimization_runs, optimization_results</div></div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">📋</span>
+      <div class="task-body"><strong>10 session state keys mapped</strong> in Streamlit<div class="task-detail">step, field_id, field_data, history_entries, problems_entries, fert_entries, climate, analysis, opt, lat, lon</div></div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">🐛</span>
+      <div class="task-body"><strong>2 pre-existing bugs found</strong>
+        <div class="task-detail">Bug 1: smoke_test.py posts <code>lat</code>/<code>lng</code> but schema uses <code>latitude</code>/<code>longitude</code> — would break React map integration immediately</div>
+        <div class="task-detail">Bug 2: <code>app/schemas/field.py</code> is a dead file — duplicates inline schemas in the router, never imported anywhere</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">🔍</span>
+      <div class="task-body"><strong>5 missing API endpoints identified</strong> that React needs but don't exist yet<div class="task-detail"><code>GET /problem-types</code>, <code>GET /fields</code>, <code>GET /crops/{id}/economics</code>, <code>GET /crops/{id}/sensitivity</code>, <code>GET /fields/{id}/optimization-runs</code></div></div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">🔍</span>
+      <div class="task-body"><strong>1 financial tab issue found</strong><div class="task-detail">Streamlit's Financial tab re-calls <code>POST /analyze</code> just to have context, then reads economics from the local Python <code>CROP_CATALOGUE</code> import — React cannot do this and needs a proper endpoint</div></div>
+    </div>
+  </div>
+</div>
+
+
+<h2>Phase 1 — Migration Plan Written</h2>
+
+<p>A complete plan file was written to <code>react-migration-plan.md</code> in the project root. It contains:</p>
+<ul>
+  <li>Architecture boundary diagram (React → HTTP/JSON → FastAPI → frozen services)</li>
+  <li>Target directory layout (<code>frontend/</code> alongside existing <code>streamlit_app.py</code>)</li>
+  <li>Full API inventory table (all 27 existing + 5 new endpoints)</li>
+  <li>TypeScript type names derived from actual backend schemas</li>
+  <li>UI design system specification (deep green palette, no gradients, professional agricultural aesthetic)</li>
+  <li>11 detailed sub-tasks with intent, expected outcomes, ordered todo lists, and relevant context</li>
+  <li>Backend integrity checklist</li>
+  <li>Rollback plan</li>
+  <li>7 stop conditions</li>
+</ul>
+
+<div class="alert success">Plan confirmed by user. Implementation approved to proceed.</div>
+
+
+<h2>Sub-Task 1 — Backend Additions &amp; Bug Fixes <span class="badge wip">IN PROGRESS</span></h2>
+
+<p>This sub-task is the only one that touches Python. All changes are read-only additions or bug fixes. No existing endpoint, calculation, schema, or business logic was modified.</p>
+
+<h3>1a. New endpoints added ✅</h3>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">app/api/v1/fields.py — 2 new endpoints appended</span>
+    <span class="badge new">NEW</span>
+  </div>
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>GET /api/v1/fields</code> — returns all registered fields ordered by most recent
+        <div class="task-detail">Used by React's "Select existing field" panel so returning users can pick their field without re-clicking the map. Calls existing <code>_field_to_read()</code> helper already in the file.</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>GET /api/v1/problem-types</code> — returns the 15-entry PROBLEM_TYPES list
+        <div class="task-detail">Streamlit imported this directly from Python (<code>from app.data.crop_data import PROBLEM_TYPES</code>). React cannot do that — it needs an HTTP endpoint. This wrapper exposes the same data over the API with zero logic change.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">app/api/v1/analysis.py — 2 new endpoints + 1 new import</span>
+    <span class="badge new">NEW</span>
+  </div>
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>GET /api/v1/crops/{crop_id}/economics?area_ha=X</code>
+        <div class="task-detail">Delegates entirely to <code>economics_service.calculate_economics(crop, area_ha)</code> which already existed but was never exposed as an endpoint. Returns: crop name, yield, price, revenue/ha, 7-item cost breakdown, total cost/ha, net margin/ha, total revenue, total cost, total margin, ROI%, disclaimer.</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>GET /api/v1/crops/{crop_id}/sensitivity?area_ha=X</code>
+        <div class="task-detail">Delegates entirely to <code>economics_service.calculate_sensitivity(crop, area_ha)</code>. Returns 3 scenarios: Conservative (75% yield, 85% price), Expected (100%/100%), Favorable (120% yield, 110% price). Each with revenue, profit, ROI. Streamlit re-implemented this logic inline — now React can call the authoritative backend function instead.</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>from app.services import economics_service</code> added to imports
+        <div class="task-detail">The module existed; it just wasn't imported in <code>analysis.py</code>. Import pattern matches the existing <code>soil_service</code>, <code>degradation_service</code>, <code>suitability_service</code> imports in that same file.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">app/api/v1/optimization.py — 1 new endpoint</span>
+    <span class="badge new">NEW</span>
+  </div>
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><code>GET /api/v1/fields/{field_id}/optimization-runs</code>
+        <div class="task-detail">Returns a list of all past CP-SAT optimization runs for a field (most recent first), with run_id, horizon, objective, status, and created_at. Enables a React history view so farmers can review previous rotation plans without re-running the optimizer.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>1b. Bug fixes ✅</h3>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">tests/smoke_test.py — 2 field naming bugs fixed + 3 new endpoint checks added</span>
+    <span class="badge fixed">FIXED</span>
+  </div>
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><strong>Bug 1 fixed:</strong> <code>find-or-create</code> call changed from <code>"lat": 17.385, "lng": 78.487</code> to <code>"latitude": 17.385, "longitude": 78.487</code>
+        <div class="task-detail">The <code>FieldCreate</code> Pydantic schema (used by the router) uses <code>latitude</code>/<code>longitude</code>. The old smoke test was posting the wrong keys — Pydantic was silently ignoring them and storing <code>null</code> coordinates. This would have broken the React map integration immediately.</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><strong>Bug 2 fixed:</strong> Problems POST changed from <code>"problem_type": "waterlogging"</code> to <code>"problem_code": "excess_water"</code>
+        <div class="task-detail">The <code>FieldProblem</code> model column is <code>problem_code</code>, not <code>problem_type</code>. The old smoke test was posting an unknown key — the problem was being stored with a <code>null</code> code. Also updated the print statement to use <code>p['problem_code']</code>.</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><strong>3 new smoke test checks added</strong> (steps 13, 14, 15)
+        <div class="task-detail">Step 13: <code>GET /fields/{id}/optimization-runs</code> — asserts ≥1 run after optimize step<br />Step 14: <code>GET /crops/{id}/economics</code> — asserts <code>net_margin_rs_ha</code> present<br />Step 15: <code>GET /crops/{id}/sensitivity</code> — asserts all 3 scenario keys present</div>
+      </div>
+    </div>
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><strong>Steps 3b and 3c added</strong>
+        <div class="task-detail">Step 3b: <code>GET /problem-types</code> — asserts ≥10 entries<br />Step 3c: <code>GET /fields</code> — prints current field count</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">app/schemas/field.py — deleted</span>
+    <span class="badge fixed">FIXED</span>
+  </div>
+  <div class="section-body">
+    <div class="task-row">
+      <span class="task-check">✅</span>
+      <div class="task-body"><strong>Dead file removed.</strong> <code>app/schemas/field.py</code> defined <code>FieldCreate</code> and <code>FieldRead</code> classes that were never imported anywhere in the codebase.
+        <div class="task-detail">A grep confirmed zero imports before deletion. The actual schemas in use are the inline Pydantic models defined directly inside <code>app/api/v1/fields.py</code>. Keeping the dead file caused confusion about which schema was authoritative.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>1c. Unit test verification ✅</h3>
+<pre>pytest tests/test_soil.py tests/test_suitability.py tests/test_optimizer.py -v
+
+============================= test session starts =============================
+collected 43 items
+
+tests/test_soil.py::test_ph_optimal                    PASSED
+tests/test_soil.py::test_ph_low                        PASSED
+tests/test_soil.py::test_ph_high                       PASSED
+tests/test_soil.py::test_ph_moderate                   PASSED
+tests/test_soil.py::test_ph_none                       PASSED
+tests/test_soil.py::test_soc_low                       PASSED
+tests/test_soil.py::test_soc_moderate                  PASSED
+tests/test_soil.py::test_soc_good                      PASSED
+tests/test_soil.py::test_nitrogen_low                  PASSED
+tests/test_soil.py::test_nitrogen_moderate             PASSED
+tests/test_soil.py::test_nitrogen_good                 PASSED
+tests/test_soil.py::test_potassium_low                 PASSED
+tests/test_soil.py::test_potassium_moderate            PASSED
+tests/test_soil.py::test_potassium_good                PASSED
+tests/test_soil.py::test_ec_good                       PASSED
+tests/test_soil.py::test_ec_moderate                   PASSED
+tests/test_soil.py::test_ec_high_salinity              PASSED
+tests/test_soil.py::test_assess_soil_healthy           PASSED
+tests/test_soil.py::test_assess_soil_degraded          PASSED
+tests/test_soil.py::test_assess_soil_demo_field        PASSED
+tests/test_soil.py::test_degradation_score_complement  PASSED
+tests/test_soil.py::test_texture_class_loam            PASSED
+tests/test_suitability.py::test_soil_score_in_range    PASSED
+... (21 more) ...
+
+============================= 43 passed in 2.74s ==============================</pre>
+
+<div class="alert success"><strong>43/43 unit tests pass.</strong> No existing test was broken by any change in Sub-Task 1.</div>
+
+<h3>1d. Smoke test status</h3>
+<div class="alert warn"><strong>Smoke test not yet run against a live server.</strong> The background server process cannot start reliably inside the tool executor environment (uvicorn exits silently with code 0 when there is no console). The unit tests (all 43 passing) and the in-file import check (<code>python -c "from app.main import app; print('App imported OK')"</code> succeeded) confirm the new code is syntactically and structurally correct. The smoke test should be run manually from a terminal: <br /><br /><code>python run.py</code>  (Terminal 1)<br /><code>python tests/smoke_test.py</code>  (Terminal 2)</div>
+
+
+<h2>Complete API Surface After Sub-Task 1</h2>
+<p>The backend now exposes <strong>32 endpoints</strong> (was 27). All 5 new ones are read-only.</p>
+
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Status</th><th>React Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GET</td><td>/api/v1/health</td><td><span class="badge done">EXISTS</span></td><td>Connection status banner</td></tr>
+    <tr><td>GET</td><td>/api/v1/crops</td><td><span class="badge done">EXISTS</span></td><td>Crop dropdowns</td></tr>
+    <tr><td>GET</td><td>/api/v1/fertilizers</td><td><span class="badge done">EXISTS</span></td><td>Fertilizer dropdown</td></tr>
+    <tr><td>GET</td><td>/api/v1/problem-types</td><td><span class="badge new">NEW ✅</span></td><td>Problems multiselect</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields</td><td><span class="badge new">NEW ✅</span></td><td>Returning-user field selector</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/</td><td><span class="badge done">EXISTS</span></td><td>Create field</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}</td><td><span class="badge done">EXISTS</span></td><td>Load field details</td></tr>
+    <tr><td>PATCH</td><td>/api/v1/fields/{id}</td><td><span class="badge done">EXISTS</span></td><td>Save farm details</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/find-or-create</td><td><span class="badge done">EXISTS</span></td><td>Map click → field registration</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/history</td><td><span class="badge done">EXISTS</span></td><td>Save crop season</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/history</td><td><span class="badge done">EXISTS</span></td><td>Load history</td></tr>
+    <tr><td>DELETE</td><td>/api/v1/fields/{id}/history</td><td><span class="badge done">EXISTS</span></td><td>Clear before re-save</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/problems</td><td><span class="badge done">EXISTS</span></td><td>Save problem</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/problems</td><td><span class="badge done">EXISTS</span></td><td>Load problems</td></tr>
+    <tr><td>DELETE</td><td>/api/v1/fields/{id}/problems</td><td><span class="badge done">EXISTS</span></td><td>Clear before re-save</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/fertilizers</td><td><span class="badge done">EXISTS</span></td><td>Save fertilizer usage</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/fertilizers</td><td><span class="badge done">EXISTS</span></td><td>Load fertilizer usage</td></tr>
+    <tr><td>DELETE</td><td>/api/v1/fields/{id}/fertilizers</td><td><span class="badge done">EXISTS</span></td><td>Clear before re-save</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/soil</td><td><span class="badge done">EXISTS</span></td><td>Save soil observation</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/soil</td><td><span class="badge done">EXISTS</span></td><td>Load soil observation</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/analyze</td><td><span class="badge done">EXISTS</span></td><td>Run full analysis</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/crops</td><td><span class="badge done">EXISTS</span></td><td>Quick suitability ranking</td></tr>
+    <tr><td>POST</td><td>/api/v1/fields/{id}/optimize</td><td><span class="badge done">EXISTS</span></td><td>Run rotation optimizer</td></tr>
+    <tr><td>GET</td><td>/api/v1/optimization/{run_id}</td><td><span class="badge done">EXISTS</span></td><td>Load stored run</td></tr>
+    <tr><td>GET</td><td>/api/v1/fields/{id}/optimization-runs</td><td><span class="badge new">NEW ✅</span></td><td>List past runs</td></tr>
+    <tr><td>GET</td><td>/api/v1/crops/{id}/economics</td><td><span class="badge new">NEW ✅</span></td><td>Financial analysis tab</td></tr>
+    <tr><td>GET</td><td>/api/v1/crops/{id}/sensitivity</td><td><span class="badge new">NEW ✅</span></td><td>Scenario analysis table</td></tr>
+  </tbody>
+</table>
+
+
+<h2>Backend Integrity Report</h2>
+
+<table>
+  <thead><tr><th>Component</th><th>Status</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>FastAPI application structure</td><td><span class="badge done">UNCHANGED</span></td><td>Routers, middleware, startup hook identical</td></tr>
+    <tr><td>Database schema (all 13 tables)</td><td><span class="badge done">UNCHANGED</span></td><td>No column added, removed, or renamed</td></tr>
+    <tr><td>SQLAlchemy ORM models</td><td><span class="badge done">UNCHANGED</span></td><td><code>app/db/models.py</code> not touched</td></tr>
+    <tr><td>Soil health algorithms</td><td><span class="badge done">UNCHANGED</span></td><td><code>soil_service.py</code> not touched</td></tr>
+    <tr><td>Crop suitability algorithms</td><td><span class="badge done">UNCHANGED</span></td><td><code>suitability_service.py</code> not touched</td></tr>
+    <tr><td>Degradation assessment</td><td><span class="badge done">UNCHANGED</span></td><td><code>degradation_service.py</code> not touched</td></tr>
+    <tr><td>Economics calculations</td><td><span class="badge done">UNCHANGED</span></td><td><code>economics_service.py</code> not touched — only called by new endpoints</td></tr>
+    <tr><td>CP-SAT rotation optimizer</td><td><span class="badge done">UNCHANGED</span></td><td><code>rotation_optimizer.py</code> not touched</td></tr>
+    <tr><td>Crop/fertilizer datasets</td><td><span class="badge done">UNCHANGED</span></td><td><code>crop_data.py</code> not touched</td></tr>
+    <tr><td>Database seeder</td><td><span class="badge done">UNCHANGED</span></td><td><code>seed.py</code> not touched</td></tr>
+    <tr><td>Existing API endpoints (27)</td><td><span class="badge done">UNCHANGED</span></td><td>No paths, methods, or response formats changed</td></tr>
+    <tr><td>Streamlit application</td><td><span class="badge done">UNCHANGED</span></td><td><code>streamlit_app.py</code> not touched — still fully runnable</td></tr>
+    <tr><td>Config / thresholds</td><td><span class="badge done">UNCHANGED</span></td><td><code>config.py</code> not touched</td></tr>
+  </tbody>
+</table>
+
+
+<h2>What Remains — Sub-Tasks 2–11</h2>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 2 — React Project Scaffold</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Create the <code>frontend/</code> directory with a working Vite + React + TypeScript project. No pages yet — just the wiring that everything else depends on.</p>
+    <h3>Deliverables</h3>
+    <ul>
+      <li><code>frontend/</code> — Vite scaffold (<code>npm create vite@latest frontend -- --template react-ts</code>)</li>
+      <li>Dependencies: <code>axios</code>, <code>react-router-dom</code>, <code>@tanstack/react-query</code>, <code>react-leaflet</code>, <code>leaflet</code>, <code>recharts</code>, <code>tailwindcss</code></li>
+      <li><code>frontend/.env</code> with <code>VITE_API_BASE_URL=http://localhost:8000</code></li>
+      <li><code>frontend/.env.example</code> (committed; <code>.env</code> gitignored)</li>
+      <li><code>frontend/src/api/client.ts</code> — Axios instance + centralized error normalisation</li>
+      <li><code>frontend/src/api/endpoints.ts</code> — all 27 API path constants (no raw strings in components)</li>
+      <li><code>frontend/src/types/index.ts</code> — all TypeScript interfaces derived from actual backend schemas</li>
+      <li><code>frontend/src/components/layout/AppShell.tsx</code> — sidebar nav + main area</li>
+      <li><code>frontend/src/components/common/BackendStatus.tsx</code> — health check banner</li>
+      <li>React Router configured with placeholder routes for all 7 pages</li>
+      <li>Tailwind palette tokens matching Streamlit design system</li>
+    </ul>
+    <p><strong>Done when:</strong> <code>npm run dev</code> opens a blank app at <code>http://localhost:5173</code>, the BackendStatus component shows "Backend connected" when FastAPI is running, and <code>npm run build</code> produces no errors.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 3 — Field Selection + Farm Details (Steps 0 &amp; 1)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> React Leaflet map for field selection. Click → lat/lng → find-or-create API call → field ID stored in state. Farm details form with PATCH. "Select existing field" panel for returning users.</p>
+    <h3>Key components</h3>
+    <ul>
+      <li><code>FieldSelectPage.tsx</code> — Leaflet map with click handler, area input, "Use This Location" button</li>
+      <li><code>FarmDetailsPage.tsx</code> — controlled form: farm name, field name, area, irrigation type, farming type, soil type, current crop</li>
+      <li><code>useWorkflow.ts</code> — custom hook holding <code>fieldId</code>, <code>fieldData</code>, current step; persisted to <code>sessionStorage</code></li>
+      <li><code>StepIndicator.tsx</code> — 7-step progress bar</li>
+      <li>"Select existing field" panel using <code>GET /api/v1/fields</code></li>
+    </ul>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 4 — Crop History Page (Step 2)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Dynamic table for entering past crop seasons. Crop dropdown from <code>GET /crops</code> (TanStack Query cached). Season type, year, production qty, unit, area, sowing/harvest dates. Entries held in local state; saved on advance (DELETE + POST loop). Season label helper in <code>utils/season.ts</code>.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 5 — Problems &amp; Fertilizer Inputs (Step 3)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Two-tab page. Problems tab: multiselect from new <code>GET /problem-types</code> endpoint (no Python imports in React). Fertilizer tab: dropdown from <code>GET /fertilizers</code> with quantity, season, and cost estimate display. Both saved on advance.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 6 — Soil Data Page (Step 4)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Soil observation form pre-filled from <code>GET /fields/{id}/soil</code>. Client-side validation (texture sum warning). Climate section. On submit: POST soil → POST analyze → store result → navigate to analysis. Loading state: "Analyzing soil…" spinner.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 7 — Analysis Results Page (Step 5)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Render the analysis response. Soil health score bar, 6 parameter score bars, degradation risk section (5 component labels), main drivers list, crop history timeline, problems pills. "Demo remote sensing" notice. "View Recommendations" triggers optimize call.</p>
+    <h3>Reusable components created here</h3>
+    <ul>
+      <li><code>ScoreBar.tsx</code> — horizontal fill bar, label, value, status colour</li>
+      <li><code>StatusPill.tsx</code> — Good/Moderate/Low/Excellent/High colour pill</li>
+      <li><code>RiskLabel.tsx</code> — colour-coded risk text</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 8 — Recommendation + Rotation Tabs (Step 6, Tabs 1 &amp; 2)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Primary recommendation cards (top-3 crops with fit/limit points, sowing/harvest windows, duration). Full suitability table (all crops, all 6 sub-scores). Rotation plan timeline (season cards, table, narrative explanations, impact summary: soil/water/disease).</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 9 — Financial Analysis Tab (Step 6, Tab 3)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> 4 key metric cards (Investment, Revenue, Profit, ROI) from <code>GET /crops/{id}/economics</code>. 7-item cost breakdown table. Sensitivity scenario table from <code>GET /crops/{id}/sensitivity</code>. Resource requirements. Cautions section. All values from backend — zero calculations in React.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 10 — Final Report Tab + Workflow Reset (Step 6, Tab 4)</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Summary data rows assembled from workflow state (no new API calls). Key observations from degradation drivers. JSON download button. "New Field" button clears all workflow state and returns to Step 0.</p>
+  </div>
+</div>
+
+<div class="section-block">
+  <div class="section-header">
+    <span class="section-title">Sub-Task 11 — README Update + Final Regression Test</span>
+    <span class="badge todo">PENDING</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Goal:</strong> Update README with backend, React, and Streamlit (legacy) instructions. Run full backend test suite and smoke test one final time. Run <code>npm run build</code> to confirm production bundle builds cleanly. Final checklist: no hard-coded agricultural values in React, no duplicate calculations, no direct DB access.</p>
+  </div>
+</div>
+
+
+<h2>How to Proceed Right Now</h2>
+
+<div class="alert">
+  <strong>To complete Sub-Task 1 verification:</strong> Open two terminals in the project root.
+  <pre>Terminal 1:   python run.py
+Terminal 2:   python tests/smoke_test.py</pre>
+  All 15 checks should pass. If any fail, report the output and we will fix before moving to Sub-Task 2.
+</div>
+
+<div class="alert success">
+  <strong>To start Sub-Task 2 (React scaffold):</strong> Confirm Sub-Task 1 smoke test passes, then say "continue" or "start sub-task 2" and the React project will be scaffolded.
+</div>
+
+
+<h2>Files Changed in Sub-Task 1</h2>
+<table>
+  <thead><tr><th>File</th><th>Change</th></tr></thead>
+  <tbody>
+    <tr><td><code>app/api/v1/fields.py</code></td><td>Added <code>GET /fields</code> and <code>GET /problem-types</code> endpoints at end of file</td></tr>
+    <tr><td><code>app/api/v1/analysis.py</code></td><td>Added <code>economics_service</code> import; added <code>GET /crops/{id}/economics</code> and <code>GET /crops/{id}/sensitivity</code> endpoints</td></tr>
+    <tr><td><code>app/api/v1/optimization.py</code></td><td>Added <code>GET /fields/{id}/optimization-runs</code> endpoint</td></tr>
+    <tr><td><code>tests/smoke_test.py</code></td><td>Fixed 2 field naming bugs; added 5 new endpoint checks (steps 3b, 3c, 13, 14, 15)</td></tr>
+    <tr><td><code>app/schemas/field.py</code></td><td><strong>Deleted</strong> — was a dead file with no imports anywhere</td></tr>
+    <tr><td><code>react-migration-plan.md</code></td><td><strong>Created</strong> — full migration plan (11 sub-tasks)</td></tr>
+  </tbody>
+</table>
+
+<h2>Files Intentionally Untouched</h2>
+<table>
+  <thead><tr><th>File</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td><code>app/db/models.py</code></td><td>Database schema frozen</td></tr>
+    <tr><td><code>app/db/database.py</code></td><td>Database engine frozen</td></tr>
+    <tr><td><code>app/core/config.py</code></td><td>All thresholds and weights frozen</td></tr>
+    <tr><td><code>app/services/soil_service.py</code></td><td>Agricultural logic frozen</td></tr>
+    <tr><td><code>app/services/suitability_service.py</code></td><td>Agricultural logic frozen</td></tr>
+    <tr><td><code>app/services/degradation_service.py</code></td><td>Agricultural logic frozen</td></tr>
+    <tr><td><code>app/services/economics_service.py</code></td><td>Calculations frozen — only called by new endpoints</td></tr>
+    <tr><td><code>app/optimization/rotation_optimizer.py</code></td><td>CP-SAT model frozen</td></tr>
+    <tr><td><code>app/data/crop_data.py</code></td><td>Dataset frozen</td></tr>
+    <tr><td><code>app/data/seed.py</code></td><td>Seeder frozen</td></tr>
+    <tr><td><code>app/main.py</code></td><td>Entry point frozen</td></tr>
+    <tr><td><code>app/api/v1/soil.py</code></td><td>Existing endpoint frozen</td></tr>
+    <tr><td><code>app/schemas/soil.py</code></td><td>Schema frozen</td></tr>
+    <tr><td><code>app/schemas/crop.py</code></td><td>Schema frozen</td></tr>
+    <tr><td><code>app/schemas/optimization.py</code></td><td>Schema frozen</td></tr>
+    <tr><td><code>streamlit_app.py</code></td><td>Legacy frontend — still runnable, not touched</td></tr>
+    <tr><td><code>run.py</code></td><td>Server entry point frozen</td></tr>
+    <tr><td><code>requirements.txt</code></td><td>Unchanged (React deps go in <code>frontend/package.json</code>)</td></tr>
+    <tr><td><code>tests/test_soil.py</code></td><td>All 43 tests pass — not modified</td></tr>
+    <tr><td><code>tests/test_suitability.py</code></td><td>All 43 tests pass — not modified</td></tr>
+    <tr><td><code>tests/test_optimizer.py</code></td><td>All 43 tests pass — not modified</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">Made with IBM Bob  ·  SoilDCRA React Migration Report</div>
+</body>
+</html>

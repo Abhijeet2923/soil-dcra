@@ -1,0 +1,166 @@
+# ==============================================================================
+# SoilDCRA .gitignore
+# Comprehensive exclusion rules for Python, FastAPI, Streamlit, SQLite,
+# AI Agent Workspaces, IDEs, and future Frontend (React / Vite) Artifacts
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Secrets, Environment Variables & Credentials
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+.streamlit/secrets.toml
+secrets/
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+
+# ------------------------------------------------------------------------------
+# 2. Local Database & Persistent Storage (Do NOT commit runtime databases)
+# ------------------------------------------------------------------------------
+soildcra.db
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+*.dump
+dump.rdb
+
+# ------------------------------------------------------------------------------
+# 3. AI Agent Tooling & Workspace Artifacts
+# ------------------------------------------------------------------------------
+.bob/
+.gemini/
+.claude/
+.cursor/
+.windsurf/
+.aider*
+scratch/
+.scratch/
+
+# ------------------------------------------------------------------------------
+# 4. Python Bytecode & Runtime Cache
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# 5. Virtual Environments
+# ------------------------------------------------------------------------------
+.venv/
+.venv*/
+venv/
+venv*/
+ENV/
+env/
+env*/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 6. Testing, Linting & Code Quality Caches
+# ------------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+htmlcov/
+.hypothesis/
+.tox/
+.nox/
+.ruff_cache/
+.mypy_cache/
+
+# ------------------------------------------------------------------------------
+# 7. Logs & Process Artifacts
+# ------------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+
+# ------------------------------------------------------------------------------
+# 8. Temporary & Backup Files
+# ------------------------------------------------------------------------------
+*.bak
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+*.orig
+
+# ------------------------------------------------------------------------------
+# 9. IDE & Editor Configurations
+# ------------------------------------------------------------------------------
+# VS Code (contains personal local paths/interpreters)
+.vscode/
+
+# JetBrains / PyCharm
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ------------------------------------------------------------------------------
+# 10. Operating System Artifacts
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------------------------------------------------------
+# 11. Frontend / React Migration Artifacts (Vite / Node / npm)
+# ------------------------------------------------------------------------------
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+dist/
+dist-ssr/
+*.local
